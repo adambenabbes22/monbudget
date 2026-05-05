@@ -7,12 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --color-primary: #6366f1;
             --color-success: #10b981;
@@ -24,11 +19,7 @@
             --color-gray-300: #d1d5db;
             --color-gray-600: #4b5563;
             --color-gray-900: #111827;
-            --color-income: #10b981;
-            --color-spend: #ef4444;
-            --color-transfer: #9ca3af;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
             background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
@@ -36,1302 +27,259 @@
             line-height: 1.6;
             padding: 24px 16px;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 48px;
-        }
-
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 48px; }
         header h1 {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-size: 48px; font-weight: 700; margin-bottom: 8px;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
-        header p {
-            font-size: 18px;
-            color: var(--color-gray-600);
-        }
-
-        .steps {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 32px;
-            justify-content: center;
-        }
-
+        header p { font-size: 18px; color: var(--color-gray-600); }
+        .steps { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 32px; justify-content: center; }
         .step-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 999px;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s;
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 20px; border-radius: 999px;
+            font-weight: 600; font-size: 16px; transition: all 0.3s;
         }
-
-        .step-indicator.active {
-            background: var(--color-primary);
-            color: white;
-        }
-
-        .step-indicator.completed {
-            background: var(--color-success);
-            color: white;
-        }
-
-        .step-indicator.pending {
-            background: var(--color-gray-200);
-            color: var(--color-gray-600);
-        }
-
+        .step-indicator.active { background: var(--color-primary); color: white; }
+        .step-indicator.completed { background: var(--color-success); color: white; }
+        .step-indicator.pending { background: var(--color-gray-200); color: var(--color-gray-600); }
         .card {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-            margin-bottom: 24px;
-            display: none;
+            background: white; border-radius: 16px; padding: 40px;
+            box-shadow: 0 1px 3px rgba(0,0,0,.1);
+            margin-bottom: 24px; display: none;
         }
-
-        .card.active {
-            display: block;
-            animation: slideIn 0.3s ease-out;
+        .card.active { display: block; }
+        .card h2 { font-size: 32px; margin-bottom: 16px; }
+        .card p { color: var(--color-gray-600); font-size: 16px; margin-bottom: 24px; }
+        .login-status { padding: 20px; border-radius: 12px; margin-bottom: 32px; font-weight: 600; }
+        .login-status.connected { background: #d1fae5; color: #065f46; }
+        .login-status.disconnected { background: #fee2e2; color: #991b1b; }
+        input[type="email"], input[type="text"], select {
+            width: 100%; padding: 14px 16px; margin-bottom: 16px;
+            border: 2px solid var(--color-gray-200); border-radius: 8px;
+            font-size: 16px;
         }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .card h2 {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-
-        .card p {
-            color: var(--color-gray-600);
-            margin-bottom: 24px;
-        }
-
-        .login-status {
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            font-weight: 600;
-        }
-
-        .login-status.connected {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .login-status.disconnected {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        input[type="email"],
-        input[type="text"],
-        select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            border: 2px solid var(--color-gray-200);
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="email"]:focus,
-        input[type="text"]:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--color-primary);
-        }
-
-        .button-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
+        input:focus, select:focus { outline: none; border-color: var(--color-primary); }
         button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            padding: 14px 32px; border: none; border-radius: 8px;
+            font-weight: 600; font-size: 16px; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: all .3s;
         }
-
-        .btn-primary {
-            background: var(--color-primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #4f46e5;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-        }
-
-        .btn-primary:disabled {
-            background: var(--color-gray-300);
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            background: var(--color-gray-200);
-            color: var(--color-gray-900);
-        }
-
-        .btn-secondary:hover {
-            background: var(--color-gray-300);
-        }
-
-        .btn-success {
-            background: var(--color-success);
-            color: white;
-            font-size: 18px;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 12px;
-            background: var(--color-gray-100);
-            color: var(--color-gray-900);
-        }
-
-        .btn-small:hover {
-            background: var(--color-gray-200);
-        }
-
-        .accounts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
-        .account-item {
-            padding: 16px;
-            border: 2px solid var(--color-gray-200);
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .account-item:hover {
-            border-color: var(--color-primary);
-            transform: translateY(-2px);
-        }
-
-        .account-item.selected {
-            background: #eef2ff;
-            border-color: var(--color-primary);
-        }
-
-        .account-item input[type="checkbox"] {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .account-emoji {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .account-name {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .account-type {
-            font-size: 12px;
-            color: var(--color-gray-600);
-        }
-
+        .btn-primary { background: var(--color-primary); color: white; }
+        .btn-primary:hover { background: #4f46e5; }
+        .btn-primary:disabled { background: var(--color-gray-300); cursor: not-allowed; }
+        .btn-secondary { background: var(--color-gray-200); color: var(--color-gray-900); }
+        .btn-success { background: var(--color-success); color: white; font-size: 18px; width: 100%; margin-top: 32px; padding: 18px; }
+        .btn-success:hover { background: #059669; }
         .dropzone {
-            border: 3px dashed var(--color-gray-300);
-            border-radius: 12px;
-            padding: 32px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: var(--color-gray-50);
-            margin-bottom: 24px;
+            border: 4px dashed var(--color-gray-300); border-radius: 16px;
+            padding: 60px 40px; text-align: center; cursor: pointer;
+            background: var(--color-gray-50); margin-bottom: 32px;
+            transition: all .3s;
         }
-
-        .dropzone.dragover {
-            border-color: var(--color-primary);
-            background: #eef2ff;
+        .dropzone.dragover { border-color: var(--color-primary); background: #eef2ff; }
+        .dropzone h3 { font-size: 24px; margin-bottom: 12px; }
+        .file-input { display: none; }
+        .chip {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 16px; border-radius: 999px;
+            font-size: 14px; font-weight: 600;
+            background: var(--color-gray-100); margin: 4px;
         }
-
-        .dropzone.completed {
-            border-color: var(--color-success);
-            background: #f0fdf4;
-        }
-
-        .dropzone h3 {
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-
-        .dropzone p {
-            color: var(--color-gray-600);
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .upload-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .transaction-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 24px;
-            overflow-x: auto;
-        }
-
-        .transaction-table thead {
-            background: var(--color-gray-100);
-        }
-
-        .transaction-table th {
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 12px;
-            color: var(--color-gray-600);
-            border-bottom: 2px solid var(--color-gray-200);
-        }
-
-        .transaction-table td {
-            padding: 12px;
-            border-bottom: 1px solid var(--color-gray-200);
-            font-size: 14px;
-        }
-
-        .transaction-table tr:hover {
-            background: var(--color-gray-50);
-        }
-
-        .checkbox-col {
-            width: 40px;
-        }
-
-        .date-col {
-            width: 80px;
-        }
-
-        .amount-col {
-            text-align: right;
-            width: 100px;
-            font-weight: 600;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .type-pill {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: capitalize;
-        }
-
-        .type-depense {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .type-revenu {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .type-transfert {
-            background: #f3f4f6;
-            color: #374151;
-        }
-
-        .category-select {
-            padding: 6px 8px;
-            font-size: 12px;
-            border-radius: 6px;
-            border: 1px solid var(--color-gray-300);
-        }
-
-        .source-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            background: var(--color-gray-200);
-            color: var(--color-gray-900);
-        }
-
-        .amount-positive {
-            color: var(--color-income);
-        }
-
-        .amount-negative {
-            color: var(--color-spend);
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: var(--color-gray-200);
-            border-radius: 999px;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--color-success);
-            transition: width 0.3s;
-        }
-
-        .message {
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            font-weight: 600;
-        }
-
-        .message.success {
-            background: #d1fae5;
-            color: #065f46;
-            border-left: 4px solid var(--color-success);
-        }
-
-        .message.error {
-            background: #fee2e2;
-            color: #991b1b;
-            border-left: 4px solid var(--color-danger);
-        }
-
-        .message.info {
-            background: #dbeafe;
-            color: #1e40af;
-            border-left: 4px solid var(--color-primary);
-        }
-
-        .filter-bar {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .filter-bar select {
-            max-width: 200px;
-        }
-
+        .chip.success { background: #d1fae5; color: #065f46; }
+        .chip.error { background: #fee2e2; color: #991b1b; }
+        .transaction-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px; }
+        .transaction-table th { padding: 12px; text-align: left; background: var(--color-gray-100); border-bottom: 2px solid var(--color-gray-200); }
+        .transaction-table td { padding: 12px; border-bottom: 1px solid var(--color-gray-200); }
+        .montant.positive { color: var(--color-success); font-weight: 600; }
+        .montant.negative { color: var(--color-danger); font-weight: 600; }
+        .montant.neutral { color: var(--color-gray-600); }
         .summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
+            display: flex; gap: 24px; padding: 20px;
+            background: var(--color-gray-50); border-radius: 12px;
+            margin-bottom: 24px; flex-wrap: wrap;
         }
-
-        .summary-item {
-            background: var(--color-gray-100);
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
+        .summary-item { flex: 1; min-width: 150px; }
+        .summary-item .label { font-size: 14px; color: var(--color-gray-600); }
+        .summary-item .value { font-size: 24px; font-weight: 700; }
+        .progress-bar { width: 100%; height: 8px; background: var(--color-gray-200); border-radius: 4px; overflow: hidden; margin-top: 16px; }
+        .progress-fill { height: 100%; background: var(--color-success); transition: width .3s; }
+        .filters { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .filters select { width: auto; min-width: 150px; margin-bottom: 0; padding: 10px 16px; }
+        .toast {
+            position: fixed; top: 20px; right: 20px;
+            padding: 16px 24px; border-radius: 8px;
+            background: white; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+            font-weight: 600; z-index: 1000;
+            animation: slideIn .3s ease-out;
         }
-
-        .summary-item-value {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .summary-item-label {
-            font-size: 12px;
-            color: var(--color-gray-600);
-            font-weight: 600;
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: space-between;
-            margin-top: 32px;
-        }
-
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 32px;
-            }
-
-            .card {
-                padding: 20px;
-            }
-
-            .upload-section {
-                grid-template-columns: 1fr;
-            }
-
-            .transaction-table {
-                font-size: 12px;
-            }
-
-            .transaction-table th,
-            .transaction-table td {
-                padding: 8px;
-            }
-
-            button {
-                padding: 10px 16px;
-                font-size: 12px;
-            }
-
-            .nav-buttons {
-                flex-direction: column;
-            }
-        }
-
-        .hidden {
-            display: none !important;
-        }
+        .toast.success { background: #d1fae5; color: #065f46; }
+        .toast.error { background: #fee2e2; color: #991b1b; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>📥 Importer mes relevés</h1>
-            <p>Drag-drop vos relevés bancaires et catégorisez les transactions</p>
+            <p>Glisse tes fichiers, je m'occupe du reste 🚀</p>
         </header>
 
         <div class="steps">
-            <div class="step-indicator active" id="step-1-ind">1️⃣ Connexion</div>
-            <div class="step-indicator pending" id="step-2-ind">2️⃣ Comptes</div>
-            <div class="step-indicator pending" id="step-3-ind">3️⃣ Upload</div>
-            <div class="step-indicator pending" id="step-4-ind">4️⃣ Aperçu</div>
-            <div class="step-indicator pending" id="step-5-ind">5️⃣ Import</div>
+            <div class="step-indicator pending" id="step-1-indicator">1️⃣ Connexion</div>
+            <div class="step-indicator pending" id="step-2-indicator">2️⃣ Upload + Aperçu</div>
+            <div class="step-indicator pending" id="step-3-indicator">3️⃣ Import</div>
         </div>
 
-        <!-- STEP 1: LOGIN -->
+        <!-- ÉTAPE 1 — CONNEXION -->
         <div class="card active" id="step-1">
             <h2>🔒 Connexion Supabase</h2>
-            <p>Connectez-vous avec votre email pour commencer l'import</p>
-
-            <div id="login-status" class="login-status disconnected">
-                🔒 Pas connecté
-            </div>
-
-            <input type="email" id="login-email" placeholder="adam@example.com">
-            <div class="button-group">
+            <p>Connecte-toi avec ton email pour commencer</p>
+            <div class="login-status disconnected" id="login-status">🔒 Pas connecté</div>
+            <input type="email" id="email-input" placeholder="adam@example.com" value="adambenabbes2@gmail.com">
+            <div style="display: flex; gap: 12px;">
                 <button class="btn-primary" onclick="sendMagicLink()">📧 Magic Link</button>
-                <button class="btn-secondary" onclick="checkAuth()">✅ Vérifier connexion</button>
+                <button class="btn-secondary" onclick="checkConnection()">✅ Vérifier connexion</button>
             </div>
-
-            <p style="margin-top: 24px; color: var(--color-gray-600); font-size: 14px;">
-                💡 Conseil: Vous recevrez un lien de connexion par email. Cliquez dessus, puis revenir ici et cliquez "Vérifier connexion".
-            </p>
+            <p style="margin-top: 24px; font-size: 14px;">💡 Tu vas recevoir un lien par email. Clique dessus, puis reviens ici.</p>
         </div>
 
-        <!-- STEP 2: SELECT/CREATE ACCOUNTS -->
+        <!-- ÉTAPE 2 — UPLOAD + APERÇU -->
         <div class="card" id="step-2">
-            <h2>🏦 Sélectionner/créer comptes</h2>
-            <p>Vos comptes existants, ou créez de nouveaux</p>
+            <h2>📥 Glisse tes relevés</h2>
+            <p>Revolut, SumUp... je détecte tout tout seul 🤖</p>
 
-            <div id="accounts-list" class="accounts-grid"></div>
+            <div class="dropzone" id="dropzone">
+                <h3>📁 Glisse tes fichiers ici</h3>
+                <p>Ou clique pour choisir</p>
+                <button class="btn-primary" onclick="document.getElementById('file-input').click()">📂 Choisir mes fichiers</button>
+                <input type="file" class="file-input" id="file-input" accept=".csv" multiple>
+            </div>
 
-            <h3 style="font-size: 18px; margin-top: 32px; margin-bottom: 16px;">Créer un nouveau compte</h3>
-            <input type="text" id="new-account-name" placeholder="Nom (ex: LCL principal)">
-            <select id="new-account-type">
-                <option value="">-- Choisir type --</option>
-                <option value="csv_lcl">🔵 LCL (PDF)</option>
-                <option value="csv_revolut">🟣 Revolut (CSV)</option>
-                <option value="csv_sumup_ventes">🟠 SumUp Ventes (CSV)</option>
-                <option value="csv_sumup_depenses">🟠 SumUp Dépenses (CSV)</option>
-            </select>
-            <button class="btn-primary" onclick="createAccount()">+ Créer compte</button>
+            <div class="detection-chips" id="detection-chips"></div>
 
-            <div class="nav-buttons">
-                <button class="btn-secondary" onclick="prevStep()">⬅️ Précédent</button>
-                <button class="btn-primary" onclick="nextStep()" id="next-from-2">Suivant ➡️</button>
+            <div id="preview-section" style="display: none;">
+                <div class="summary" id="summary"></div>
+                <div class="filters">
+                    <select id="filter-source" onchange="renderTable()">
+                        <option value="">Toutes les sources</option>
+                    </select>
+                    <select id="filter-type" onchange="renderTable()">
+                        <option value="">Tous les types</option>
+                        <option value="depense">Dépenses</option>
+                        <option value="revenu">Revenus</option>
+                        <option value="transfert">Transferts</option>
+                    </select>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="transaction-table" id="transaction-table">
+                        <thead>
+                            <tr>
+                                <th>📅 Date</th>
+                                <th>Libellé</th>
+                                <th>💰 Montant</th>
+                                <th>Type</th>
+                                <th>🏷️ Catégorie</th>
+                                <th>Source</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-tbody"></tbody>
+                    </table>
+                </div>
+                <button class="btn-success" onclick="goToStep3()">➡️ Continuer vers l'import</button>
             </div>
         </div>
 
-        <!-- STEP 3: UPLOAD FILES -->
+        <!-- ÉTAPE 3 — IMPORT -->
         <div class="card" id="step-3">
-            <h2>📤 Charger vos relevés</h2>
-            <p>Glissez-déposez vos fichiers CSV ou PDF ci-dessous</p>
-
-            <div class="upload-section">
-                <div class="dropzone" id="revolut-zone" onclick="document.getElementById('revolut-file').click()">
-                    <div class="account-emoji">🟣</div>
-                    <h3>Revolut CSV</h3>
-                    <p>Type, Product, Started Date, ...</p>
-                    <input type="file" id="revolut-file" class="file-input" accept=".csv">
-                    <button class="btn-small">Parcourir</button>
-                </div>
-
-                <div class="dropzone" id="sumup-ventes-zone" onclick="document.getElementById('sumup-ventes-file').click()">
-                    <div class="account-emoji">🟠</div>
-                    <h3>SumUp Ventes</h3>
-                    <p>Email, Date, Réf. transaction, ...</p>
-                    <input type="file" id="sumup-ventes-file" class="file-input" accept=".csv">
-                    <button class="btn-small">Parcourir</button>
-                </div>
-
-                <div class="dropzone" id="sumup-depenses-zone" onclick="document.getElementById('sumup-depenses-file').click()">
-                    <div class="account-emoji">🟠</div>
-                    <h3>SumUp Dépenses</h3>
-                    <p>N°, Date, Description, ...</p>
-                    <input type="file" id="sumup-depenses-file" class="file-input" accept=".csv">
-                    <button class="btn-small">Parcourir</button>
-                </div>
-            </div>
-
-            <div class="nav-buttons">
-                <button class="btn-secondary" onclick="prevStep()">⬅️ Précédent</button>
-                <button class="btn-primary" onclick="nextStep()" id="next-from-3">Suivant ➡️</button>
-            </div>
-        </div>
-
-        <!-- STEP 4: PREVIEW & EDIT -->
-        <div class="card" id="step-4">
-            <h2>👁️ Aperçu des transactions</h2>
-            <p>Vérifiez et corrigez les catégorisations</p>
-
-            <div class="summary" id="transaction-summary"></div>
-
-            <div class="filter-bar">
-                <select id="filter-source" onchange="filterTransactions()">
-                    <option value="">Tous les sources</option>
-                    <option value="csv_revolut">🟣 Revolut</option>
-                    <option value="csv_sumup_ventes">🟠 SumUp Ventes</option>
-                    <option value="csv_sumup_depenses">🟠 SumUp Dépenses</option>
-                </select>
-
-                <select id="filter-type" onchange="filterTransactions()">
-                    <option value="">Tous les types</option>
-                    <option value="depense">💸 Dépenses</option>
-                    <option value="revenu">💰 Revenus</option>
-                    <option value="transfert">↔️ Transferts</option>
-                </select>
-
-                <button class="btn-small" onclick="selectAllTransactions()">Sélectionner tout</button>
-                <button class="btn-small" onclick="deselectAllTransactions()">Désélectionner tout</button>
-            </div>
-
-            <div style="overflow-x: auto;">
-                <table class="transaction-table">
-                    <thead>
-                        <tr>
-                            <th class="checkbox-col"><input type="checkbox" id="select-all" onchange="toggleSelectAll(this)"></th>
-                            <th class="date-col">📅 Date</th>
-                            <th>Libellé</th>
-                            <th class="amount-col">💰 Montant</th>
-                            <th>Type</th>
-                            <th>🏷️ Catégorie</th>
-                            <th style="width: 60px;">Source</th>
-                        </tr>
-                    </thead>
-                    <tbody id="transaction-tbody"></tbody>
-                </table>
-            </div>
-
-            <div class="nav-buttons">
-                <button class="btn-secondary" onclick="prevStep()">⬅️ Précédent</button>
-                <button class="btn-primary" onclick="nextStep()" id="next-from-4">Suivant ➡️</button>
-            </div>
-        </div>
-
-        <!-- STEP 5: IMPORT -->
-        <div class="card" id="step-5">
             <h2>🚀 Importer dans Supabase</h2>
-            <p>Finalisez l'import de vos transactions</p>
-
-            <div id="import-summary" class="summary"></div>
-
-            <div id="import-progress" class="hidden">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress-fill"></div>
-                </div>
-                <p id="progress-text" style="text-align: center; font-weight: 600;">Import en cours...</p>
+            <p>Tout est prêt, on y va !</p>
+            <div class="summary" id="final-summary"></div>
+            <button class="btn-success" onclick="doImport()" id="import-btn">🚀 Importer <span id="import-count">0</span> transactions</button>
+            <div class="progress-bar" id="progress-container" style="display: none;">
+                <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
             </div>
-
-            <div id="import-messages"></div>
-
-            <button class="btn-success" onclick="executeImport()" id="import-btn">🚀 Importer X transactions</button>
-
-            <div class="nav-buttons">
-                <button class="btn-secondary" onclick="prevStep()">⬅️ Précédent</button>
-            </div>
+            <div id="import-status" style="margin-top: 16px; font-weight: 600;"></div>
         </div>
     </div>
-
     <script>
         const SUPABASE_URL = 'https://frukcrjutqvbuvwbdntj.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZydWtjcmp1dHF2YnV2d2JkbnRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4ODQyOTgsImV4cCI6MjA5MzQ2MDI5OH0.eLfnRtNQlQf9mLWDQCeytspnxH_SRGNRcjPCs5UAvc8';
-
         const { createClient } = window.supabase;
         const sbClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        window.state = {
-            currentStep: 1,
-            supabase: sbClient,
-            user: null,
-            accounts: [],
-            selectedAccountId: null,
-            parsedTransactions: [],
-            selectedTransactions: [],
-        };
+        let currentUser = null;
+        let allTransactions = [];
+        let accountMap = {};
 
-        window.sendMagicLink = async () => {
-            const email = document.getElementById('login-email').value.trim();
-            if (!email) {
-                alert('Veuillez entrer votre email');
-                return;
+        // ============= TOAST =============
+        function showToast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3500);
+        }
+
+        // ============= ÉTAPES =============
+        function setStep(n) {
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById('step-' + i).classList.remove('active');
+                const ind = document.getElementById('step-' + i + '-indicator');
+                ind.classList.remove('active', 'completed', 'pending');
+                if (i < n) ind.classList.add('completed');
+                else if (i === n) ind.classList.add('active');
+                else ind.classList.add('pending');
             }
+            document.getElementById('step-' + n).classList.add('active');
+        }
 
+        // ============= CONNEXION =============
+        async function sendMagicLink() {
+            const email = document.getElementById('email-input').value.trim();
+            if (!email) return showToast('Email requis', 'error');
             try {
-                const { error } = await window.state.supabase.auth.signInWithOtp({ email });
+                const { error } = await sbClient.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin } });
                 if (error) throw error;
-                alert(`Lien envoyé à ${email}. Vérifiez votre boîte mail!`);
-            } catch (err) {
-                alert(`Erreur: ${err.message}`);
-            }
-        };
-
-        window.checkAuth = async () => {
-            try {
-                const { data: { user } } = await window.state.supabase.auth.getUser();
-                if (user) {
-                    window.state.user = user;
-                    updateLoginStatus(true);
-                    loadAccounts();
-                    goToStep(2);
-                } else {
-                    alert('Pas encore connecté. Vérifiez votre email.');
-                }
-            } catch (err) {
-                alert(`Erreur: ${err.message}`);
-            }
-        };
-
-        function updateLoginStatus(connected) {
-            const elem = document.getElementById('login-status');
-            if (connected) {
-                elem.className = 'login-status connected';
-                elem.textContent = `Connecté en tant que ${window.state.user.email}`;
-            } else {
-                elem.className = 'login-status disconnected';
-                elem.textContent = 'Pas connecté';
+                showToast('📧 Email envoyé ! Clique le lien et reviens ici.');
+            } catch (e) {
+                showToast('Erreur: ' + e.message, 'error');
             }
         }
 
-        window.loadAccounts = async () => {
-            try {
-                const { data, error } = await window.state.supabase
-                    .from('accounts')
-                    .select('*')
-                    .eq('user_id', window.state.user.id);
-                if (error) throw error;
-                window.state.accounts = data || [];
-                renderAccountsList();
-            } catch (err) {
-                console.error('Error loading accounts:', err);
+        async function checkConnection() {
+            const { data: { session } } = await sbClient.auth.getSession();
+            if (session && session.user) {
+                currentUser = session.user;
+                document.getElementById('login-status').className = 'login-status connected';
+                document.getElementById('login-status').textContent = '✅ Connecté: ' + session.user.email;
+                showToast('✅ Connecté !');
+                setTimeout(() => setStep(2), 800);
+            } else {
+                showToast('Pas connecté. Vérifie ton email.', 'error');
             }
-        };
-
-        function renderAccountsList() {
-            const container = document.getElementById('accounts-list');
-            container.innerHTML = '';
-
-            const emojis = {
-                csv_lcl: '🔵',
-                csv_revolut: '🟣',
-                csv_sumup_ventes: '🟠',
-                csv_sumup_depenses: '🟠',
-            };
-
-            window.state.accounts.forEach(acc => {
-                const div = document.createElement('div');
-                div.className = 'account-item';
-                div.innerHTML = `
-                    <input type="checkbox" onchange="selectAccount(${acc.id}, this.checked)">
-                    <div class="account-emoji">${emojis[acc.provider_type] || '💳'}</div>
-                    <div class="account-name">${acc.nom}</div>
-                    <div class="account-type">${acc.provider_type}</div>
-                `;
-                container.appendChild(div);
-            });
         }
 
-        window.selectAccount = (accountId, checked) => {
-            const elem = document.querySelector(`input[onchange="selectAccount(${accountId}, this.checked)"]`).closest('.account-item');
-            if (checked) {
-                elem.classList.add('selected');
-                window.state.selectedAccountId = accountId;
-            } else {
-                elem.classList.remove('selected');
-                window.state.selectedAccountId = null;
-            }
-        };
-
-        window.createAccount = async () => {
-            const name = document.getElementById('new-account-name').value.trim();
-            const type = document.getElementById('new-account-type').value;
-
-            if (!name || !type) {
-                alert('Nom et type requis');
-                return;
-            }
-
-            try {
-                const { data, error } = await window.state.supabase
-                    .from('accounts')
-                    .insert([{
-                        user_id: window.state.user.id,
-                        nom: name,
-                        provider_type: type,
-                        devise: 'EUR',
-                        type_compte: 'Courant',
-                        couleur: '#6366f1',
-                    }])
-                    .select();
-                if (error) throw error;
-
-                document.getElementById('new-account-name').value = '';
-                document.getElementById('new-account-type').value = '';
-                loadAccounts();
-            } catch (err) {
-                alert(`Erreur: ${err.message}`);
-            }
-        };
-
-        const fileInputs = ['revolut-file', 'sumup-ventes-file', 'sumup-depenses-file'];
-        fileInputs.forEach(id => {
-            const input = document.getElementById(id);
-            const zone = document.getElementById(id.replace('-file', '-zone'));
-
-            input.addEventListener('change', (e) => {
-                if (e.target.files[0]) {
-                    handleFile(e.target.files[0], id);
+        sbClient.auth.onAuthStateChange((event, session) => {
+            if (session && session.user) {
+                currentUser = session.user;
+                document.getElementById('login-status').className = 'login-status connected';
+                document.getElementById('login-status').textContent = '✅ Connecté: ' + session.user.email;
+                if (document.getElementById('step-1').classList.contains('active')) {
+                    setTimeout(() => setStep(2), 500);
                 }
-            });
-
-            zone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                zone.classList.add('dragover');
-            });
-
-            zone.addEventListener('dragleave', () => {
-                zone.classList.remove('dragover');
-            });
-
-            zone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                zone.classList.remove('dragover');
-                if (e.dataTransfer.files[0]) {
-                    handleFile(e.dataTransfer.files[0], id);
-                }
-            });
+            }
         });
 
-        function handleFile(file, inputId) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const csv = e.target.result;
-                const zone = document.getElementById(inputId.replace('-file', '-zone'));
-
-                let provider;
-                if (inputId === 'revolut-file') provider = 'csv_revolut';
-                else if (inputId === 'sumup-ventes-file') provider = 'csv_sumup_ventes';
-                else provider = 'csv_sumup_depenses';
-
-                parseCSV(csv, provider);
-                zone.classList.add('completed');
-                zone.innerHTML += `<p style="color: var(--color-success); font-weight: 600;">✅ ${file.name}</p>`;
-            };
-            reader.readAsText(file);
+        // ============= DETECTION =============
+        function detectFormat(headers) {
+            const h = headers.map(x => (x || '').toLowerCase().trim());
+            const has = (s) => h.some(x => x.includes(s));
+            if (has('started date') && has('completed date') && has('amount') && has('fee')) return 'revolut';
+            if (has('réf. transaction') && has('type de transaction') && has('montant total') && has('virement')) return 'sumup_ventes';
+            if (has('montant ht') && has('montant de la tva') && has('fournisseur')) return 'sumup_depenses';
+            return null;
         }
-
-        function parseCSV(csv, provider) {
-            Papa.parse(csv, {
-                header: true,
-                skipEmptyLines: true,
-                complete: (results) => {
-                    const txs = parseProvider(results.data, provider);
-                    window.state.parsedTransactions.push(...txs);
-                    console.log(`Parsed ${txs.length} transactions from ${provider}`);
-                },
-            });
-        }
-
-        function parseProvider(rows, provider) {
-            const out = [];
-            rows.forEach(row => {
-                if (provider === 'csv_revolut') {
-                    if (row.State?.toUpperCase() !== 'COMPLETED') return;
-                    const amount = parseFloat(row.Amount) || 0;
-                    const fee = parseFloat(row.Fee) || 0;
-                    const signed = row.Type === 'Charge' && amount === 0 && fee > 0 ? -fee : amount;
-
-                    const type = classifyRevolut(row, signed);
-                    const tx = {
-                        provider_type: provider,
-                        provider_external_id: hashRow(row),
-                        date: row['Completed Date']?.substring(0, 10) || '',
-                        libelle: row.Description || '',
-                        montant: Math.round(signed * 100) / 100,
-                        devise: row.Currency || 'EUR',
-                        type: type[0],
-                        categorie: type[1],
-                        sous_categorie: type[2],
-                        libelle_clean: (row.Description || '').toUpperCase(),
-                        contrepartie: row.Description || '',
-                        raw: row,
-                    };
-                    out.push(tx);
-
-                    if (row.Type !== 'Charge' && fee > 0) {
-                        out.push({
-                            provider_type: provider,
-                            provider_external_id: hashRow(row) + '_fee',
-                            date: row['Completed Date']?.substring(0, 10) || '',
-                            libelle: `Frais Revolut — ${row.Description || ''}`,
-                            montant: -Math.round(fee * 100) / 100,
-                            devise: row.Currency || 'EUR',
-                            type: 'depense',
-                            categorie: 'Frais bancaires',
-                            sous_categorie: 'Revolut',
-                            libelle_clean: `FRAIS REVOLUT`,
-                            contrepartie: 'Revolut',
-                            raw: row,
-                        });
-                    }
-                } else if (provider === 'csv_sumup_ventes') {
-                    if (row['Type de transaction']?.trim() === 'Vente' && row.Status?.trim() === 'Accepté') {
-                        const montant = parseAmount(row['Montant total']);
-                        const frais = parseAmount(row.Frais);
-                        const ref = row['Réf. transaction']?.trim();
-
-                        const tx = {
-                            provider_type: provider,
-                            provider_external_id: ref || null,
-                            date: row.Date?.substring(0, 10) || '',
-                            libelle: row.Description || 'Vente SumUp',
-                            montant: Math.round(montant * 100) / 100,
-                            devise: 'EUR',
-                            type: 'revenu',
-                            categorie: 'Activité — Location',
-                            sous_categorie: row.Description || '',
-                            libelle_clean: (row.Description || '').toUpperCase(),
-                            contrepartie: 'Client SumUp',
-                            raw: row,
-                        };
-                        out.push(tx);
-
-                        if (frais > 0) {
-                            out.push({
-                                provider_type: provider,
-                                provider_external_id: (ref || '') + '_fee',
-                                date: row.Date?.substring(0, 10) || '',
-                                libelle: `Frais SumUp — ${row.Description || ''}`,
-                                montant: -Math.round(frais * 100) / 100,
-                                devise: 'EUR',
-                                type: 'depense',
-                                categorie: 'Frais bancaires',
-                                sous_categorie: 'SumUp',
-                                libelle_clean: 'FRAIS SUMUP',
-                                contrepartie: 'SumUp',
-                                raw: row,
-                            });
-                        }
-                    } else if (row['Type de transaction']?.trim() === 'Virement' && row.Status?.trim() === 'Payé') {
-                        const montant = parseAmount(row.Virement);
-                        const ref = row['Réf. transaction']?.trim();
-                        out.push({
-                            provider_type: 'csv_sumup_payouts',
-                            provider_external_id: (ref || '') + '_payout',
-                            date: (row['Date du virement'] || row.Date)?.substring(0, 10) || '',
-                            libelle: 'Payout SumUp → compte externe',
-                            montant: -Math.round(montant * 100) / 100,
-                            devise: 'EUR',
-                            type: 'transfert',
-                            categorie: 'Transfert',
-                            sous_categorie: 'SumUp → compte externe',
-                            libelle_clean: 'PAYOUT SUMUP',
-                            contrepartie: 'Compte externe',
-                            raw: row,
-                        });
-                    }
-                } else if (provider === 'csv_sumup_depenses') {
-                    const statut = (row['Statut de paiement'] || '').toLowerCase();
-                    if (statut && !['payée', 'payee', 'paid'].includes(statut)) return;
-
-                    const ht = parseAmount(row['Montant HT']);
-                    const tva = parseAmount(row['Montant de la TVA']);
-                    const ttc = Math.round((ht + tva) * 100) / 100;
-                    if (ttc === 0) return;
-
-                    const desc = (row.Description || '').trim();
-                    const fournisseur = (row.Fournisseur || '').trim();
-
-                    if (desc === 'Bank transfer') {
-                        out.push({
-                            provider_type: provider,
-                            provider_external_id: hashRow(row),
-                            date: row.Date?.substring(0, 10) || '',
-                            libelle: `Virement SumUp → ${fournisseur || 'compte perso'}`,
-                            montant: -ttc,
-                            devise: 'EUR',
-                            type: 'transfert',
-                            categorie: 'Transfert',
-                            sous_categorie: 'SumUp → compte perso',
-                            libelle_clean: 'VIREMENT SUMUP',
-                            contrepartie: fournisseur || null,
-                            raw: row,
-                        });
-                    } else {
-                        const catMap = {
-                            'Représentation et restauration': ['Restaurants', null],
-                            'Déplacements': ['Transport', null],
-                            'Fournitures de bureau': ['Courses / Maison', null],
-                            'Matières premières': ['Activité — Achats', null],
-                            'Expédition et affranchissement': ['Activité — Frais', 'Expédition'],
-                            'Salaires': ['Salaires versés', null],
-                            'Autres': [null, null],
-                        };
-                        const cat = row.Catégorie?.trim();
-                        const [categorie, sous] = catMap[cat] || [null, null];
-
-                        out.push({
-                            provider_type: provider,
-                            provider_external_id: hashRow(row),
-                            date: row.Date?.substring(0, 10) || '',
-                            libelle: fournisseur || desc || 'Dépense SumUp',
-                            montant: -ttc,
-                            devise: 'EUR',
-                            type: 'depense',
-                            categorie,
-                            sous_categorie: sous,
-                            libelle_clean: (fournisseur || desc || '').toUpperCase(),
-                            contrepartie: fournisseur || null,
-                            raw: row,
-                        });
-                    }
-                }
-            });
-            return out;
-        }
-
-        function classifyRevolut(row, signed) {
-            const t = row.Type;
-            const desc = (row.Description || '').toUpperCase();
-
-            if (t === 'Topup' && desc.includes('AE2B')) return ['revenu', 'Salaire', 'AE2B'];
-            if (t === 'Topup' && desc.includes('ADAM BEN ABBES')) return ['transfert', 'Transfert', 'Auto-virement'];
-            if (t === 'Transfer' && (desc.includes('POCKET') || desc.includes('INSTANT ACCESS'))) return ['transfert', 'Transfert', 'Sous-compte'];
-            if (t === 'Transfer' && desc.includes('ADAM BEN ABBES')) return ['transfert', 'Transfert', 'Auto-virement'];
-            if (desc.includes('REVOLUT DIGITAL ASSETS')) return ['depense', 'Investissement', 'Crypto'];
-            if (t === 'Charge') return ['depense', 'Frais bancaires', 'Revolut'];
-            if (t === 'ATM') return ['depense', 'Espèces', 'Retrait'];
-
-            if (signed < 0) return ['depense', null, null];
-            if (signed > 0) return ['revenu', null, null];
-            return [null, null, null];
-        }
-
-        function hashRow(row) {
-            let key = '';
-            for (let k in row) {
-                key += (row[k] || '') + '|';
-            }
-            let hash = 0;
-            for (let i = 0; i < key.length; i++) {
-                const char = key.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-            }
-            return Math.abs(hash).toString(16).substring(0, 16);
-        }
-
-        function parseAmount(s) {
-            if (!s) return 0;
-            s = String(s).replace(/\s/g, '').replace(',', '.');
-            return parseFloat(s) || 0;
-        }
-
-        window.goToStep = (step) => {
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            document.getElementById(`step-${step}`).classList.add('active');
-
-            document.querySelectorAll('.step-indicator').forEach((el, i) => {
-                const stepNum = i + 1;
-                el.className = 'step-indicator';
-                if (stepNum < step) el.classList.add('completed');
-                else if (stepNum === step) el.classList.add('active');
-                else el.classList.add('pending');
-            });
-
-            window.state.currentStep = step;
-
-            if (step === 4) {
-                renderTransactionTable();
-                updateTransactionSummary();
-            } else if (step === 5) {
-                updateImportSummary();
-            }
-        };
-
-        window.nextStep = () => goToStep(window.state.currentStep + 1);
-        window.prevStep = () => goToStep(window.state.currentStep - 1);
-
-        function renderTransactionTable() {
-            const tbody = document.getElementById('transaction-tbody');
-            tbody.innerHTML = '';
-
-            const categories = getUniqueCategories();
-
-            window.state.parsedTransactions.forEach((tx, idx) => {
-                const tr = document.createElement('tr');
-                tr.dataset.index = idx;
-                tr.innerHTML = `
-                    <td class="checkbox-col"><input type="checkbox" class="tx-checkbox" onchange="updateSelectedTransactions()"></td>
-                    <td class="date-col">${tx.date}</td>
-                    <td><strong>${tx.libelle}</strong></td>
-                    <td class="amount-col ${tx.montant > 0 ? 'amount-positive' : 'amount-negative'}">${formatMoney(tx.montant)}</td>
-                    <td><span class="type-pill type-${tx.type || 'unknown'}">${tx.type || '—'}</span></td>
-                    <td>
-                        <select class="category-select" onchange="updateCategory(${idx}, this.value)">
-                            <option value="">${tx.categorie || '—'}</option>
-                            ${categories.map(c => `<option value="${c}">${c}</option>`).join('')}
-                        </select>
-                    </td>
-                    <td><span class="source-badge">${tx.provider_type}</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function getUniqueCategories() {
-            const cats = new Set();
-            window.state.parsedTransactions.forEach(tx => {
-                if (tx.categorie) cats.add(tx.categorie);
-            });
-            return Array.from(cats).sort();
-        }
-
-        window.updateCategory = (idx, newCat) => {
-            if (newCat) window.state.parsedTransactions[idx].categorie = newCat;
-        };
-
-        window.updateSelectedTransactions = () => {
-            window.state.selectedTransactions = Array.from(
-                document.querySelectorAll('.tx-checkbox:checked')
-            ).map(cb => {
-                const idx = cb.closest('tr').dataset.index;
-                return window.state.parsedTransactions[parseInt(idx)];
-            });
-        };
-
-        window.toggleSelectAll = (checkbox) => {
-            document.querySelectorAll('.tx-checkbox').forEach(cb => {
-                cb.checked = checkbox.checked;
-            });
-            updateSelectedTransactions();
-        };
-
-        window.selectAllTransactions = () => {
-            document.querySelectorAll('.tx-checkbox').forEach(cb => cb.checked = true);
-            updateSelectedTransactions();
-        };
-
-        window.deselectAllTransactions = () => {
-            document.querySelectorAll('.tx-checkbox').forEach(cb => cb.checked = false);
-            updateSelectedTransactions();
-        };
-
-        window.filterTransactions = () => {
-            const source = document.getElementById('filter-source').value;
-            const type = document.getElementById('filter-type').value;
-
-            document.querySelectorAll('.transaction-table tbody tr').forEach(tr => {
-                const idx = tr.dataset.index;
-                const tx = window.state.parsedTransactions[parseInt(idx)];
-
-                const matchSource = !source || tx.provider_type === source;
-                const matchType = !type || tx.type === type;
-
-                tr.style.display = (matchSource && matchType) ? '' : 'none';
-            });
-        };
-
-        function updateTransactionSummary() {
-            const summary = document.getElementById('transaction-summary');
-            const total = window.state.parsedTransactions.length;
-            const income = window.state.parsedTransactions.filter(t => t.type === 'revenu').reduce((s, t) => s + t.montant, 0);
-            const spend = Math.abs(window.state.parsedTransactions.filter(t => t.type === 'depense').reduce((s, t) => s + t.montant, 0));
-
-            summary.innerHTML = `
-                <div class="summary-item">
-                    <div class="summary-item-value">${total}</div>
-                    <div class="summary-item-label">Transactions</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-item-value" style="color: var(--color-income);">+${formatMoney(income)}</div>
-                    <div class="summary-item-label">Revenus</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-item-value" style="color: var(--color-spend);">-${formatMoney(spend)}</div>
-                    <div class="summary-item-label">Dépenses</div>
-                </div>
-            `;
-        }
-
-        function updateImportSummary() {
-            const summary = document.getElementById('import-summary');
-            const importBtn = document.getElementById('import-btn');
-            const count = window.state.selectedTransactions.length;
-
-            const income = window.state.selectedTransactions.filter(t => t.type === 'revenu').reduce((s, t) => s + t.montant, 0);
-            const spend = Math.abs(window.state.selectedTransactions.filter(t => t.type === 'depense').reduce((s, t) => s + t.montant, 0));
-
-            summary.innerHTML = `
-                <div class="summary-item">
-                    <div class="summary-item-value">${count}</div>
-                    <div class="summary-item-label">À importer</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-item-value" style="color: var(--color-income);">+${formatMoney(income)}</div>
-                    <div class="summary-item-label">Revenus</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-item-value" style="color: var(--color-spend);">-${formatMoney(spend)}</div>
-                    <div class="summary-item-label">Dépenses</div>
-                </div>
-            `;
-
-            importBtn.textContent = `Importer ${count} transactions`;
-        }
-
-        function formatMoney(amount) {
-            return new Intl.NumberFormat('fr-FR', {
-                style: 'currency',
-                currency: 'EUR',
-                minimumFractionDigits: 2,
-            }).format(amount);
-        }
-
-        window.executeImport = async () => {
-            if (!window.state.selectedAccountId) {
-                alert('Veuillez sélectionner un compte');
-                return;
-            }
-
-            if (window.state.selectedTransactions.length === 0) {
-                alert('Aucune transaction sélectionnée');
-                return;
-            }
-
-            const progressDiv = document.getElementById('import-progress');
-            const messagesDiv = document.getElementById('import-messages');
-            const importBtn = document.getElementById('import-btn');
-
-            progressDiv.classList.remove('hidden');
-            messagesDiv.innerHTML = '';
-            importBtn.disabled = true;
-
-            const rows = window.state.selectedTransactions.map(tx => ({
-                user_id: window.state.user.id,
-                account_id: window.state.selectedAccountId,
-                date: tx.date,
-                montant: tx.montant,
-                libelle: tx.libelle,
-                libelle_clean: tx.libelle_clean,
-                categorie: tx.categorie,
-                sous_categorie: tx.sous_categorie,
-                type: tx.type,
-                provider_external_id: tx.provider_external_id,
-                raw: tx.raw,
-                validated: true,
-            }));
-
-            let success = 0;
-            let errors = 0;
-
-            for (let i = 0; i < rows.length; i++) {
-                const { error } = await window.state.supabase
-                    .from('transactions')
-                    .upsert([rows[i]], { onConflict: 'account_id,provider_external_id' });
-
-                if (error) {
-                    errors++;
-                    messagesDiv.innerHTML += `<div class="message error">Erreur ligne ${i + 1}: ${error.message}</div>`;
-                } else {
-                    success++;
-                }
-
-                const pct = Math.round((i + 1) / rows.length * 100);
-                document.getElementById('progress-fill').style.width = pct + '%';
-                document.getElementById('progress-text').textContent = `${success}/${rows.length} importées...`;
-            }
-
-            progressDiv.classList.add('hidden');
-            importBtn.disabled = false;
-
-            if (errors === 0) {
-                messagesDiv.innerHTML = `<div class="message success">${success} transactions importées avec succès!</div>`;
-            } else {
-                messagesDiv.innerHTML += `<div class="message warning">${success} OK, ${errors} erreurs</div>`;
-            }
-        };
-
-        checkAuth();
-    </script>
-</body>
-</html>
